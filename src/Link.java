@@ -16,6 +16,11 @@ public class Link {
     public String toString(){
         return "(" + this.from + ", " + this.to + ")";
     }
+    
+    public Link reverse() {
+    	Link reverse = new Link(this.to, this.from);
+    	return reverse;
+    }
 
 
     @Override

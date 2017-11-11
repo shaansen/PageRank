@@ -26,53 +26,38 @@ public class Main {
         f_param 	= (float)0.7;
         pages 		= processInputPages(input_path);
         epsilon 	= (float) 0.01/n;
+        pages		= getInboundLinksIntoPages(pages);
         
         
+        // Calculate Total Score for all Pages
         for(Page p : pages){
-        	//System.out.println(p);
         	sum_base += p.base;
         }
         
+        // Use Total Score above to get the normalized score
         for(Page p : pages){ 
         	p.score = p.base = p.base / sum_base; 
-        	//System.out.println("");tt
         }
-        //System.out.println("SUM OF BASE SCORES: " + sum_base);
-
-        ///// (2) Initialize link outWeights for outlinks of all pages /////
+ 
+        // Declaration of Inweights and Outweights
         outWeights = new float[n][n];
         inWeights = new float[n][n];
-
+        
         for(Page p : pages){
         	// if page has no outlinks, then assign w[p] a weight of 1/n for all q
-            if(p.outlinks.size() == 0 || p.inlinks.size() == 0 ){
-            	if(p.outlinks.size() == 0){
-                    for(int j=0; j<n; j++){
-                        outWeights[j][lookup.get(p.title)] = (float) 1.0/n;
-                    }
+        	if(p.outlinks.size() == 0){
+                for(int j=0; j<n; j++){
+                    outWeights[j][lookup.get(p.title)] = (float) 1.0/n;
                 }
-            	if(p.inlinks.size() == 0){
-            		for(int j=0; j<n; j++){
-                        inWeights[lookup.get(p.title)][j] = (float) 1.0/n;
-                    }
-                    
-                }
-            	
             }
-
-            // compute link outWeights
+            	
+        	// compute link outWeights
             else{
                 // get unnormalized outWeights
             	for(Link l : p.outlinks){
-                    outWeights[lookup.get(l.to)][lookup.get(l.from)] += calculateWeight(l, p);
+            		outWeights[lookup.get(l.to)][lookup.get(l.from)] += calculateWeight(l, p);
                 }
-            	for(Link l : p.inlinks){
-            		inWeights[lookup.get(l.from)][lookup.get(l.to)] += calculateWeight(l, p);
-                }
-            	
-            	
-
-                //get sum
+            	//get sum
                 float sum = 0;
                 for(int j=0; j<n; j++){
                     sum += outWeights[j][lookup.get(p.title)];
@@ -83,29 +68,40 @@ public class Main {
                     outWeights[j][lookup.get(p.title)] = outWeights[j][lookup.get(p.title)] / sum;
                 }
                 
-                System.out.println("Page : "+p);
-                System.out.println("===============================================================================");
-                
-                sum = 0;
+            }
+        	
+        	
+        	
+        	// if page has no inlinks, then assign w[p] a weight of 1/n for all q
+        	if(p.inlinks.size() == 0){
                 for(int j=0; j<n; j++){
-                    sum += inWeights[lookup.get(p.title)][j];
-                }
-
-                //adjust outWeights to be normalized
-                for(int j=0; j<n; j++){
-                	inWeights[lookup.get(p.title)][j] = inWeights[lookup.get(p.title)][j] / sum;
-                    
+                    inWeights[j][lookup.get(p.title)] = (float) 1.0/n;
                 }
             }
+            	
+        	// compute link inWeights
+            else{
+                // get unnormalized inWeights
+            	for(Link l : p.inlinks){
+            		inWeights[lookup.get(l.to)][lookup.get(l.from)] += calculateWeight(l, p);
+                }
+            	//get sum
+                float sum = 0;
+                for(int j=0; j<n; j++){
+                    sum += inWeights[j][lookup.get(p.title)];
+                }
+
+                //adjust inWeights to be normalized
+                for(int j=0; j<n; j++){
+                    inWeights[j][lookup.get(p.title)] = inWeights[j][lookup.get(p.title)] / sum;
+                }
+                
+            }        	
         }
         
-        for (int i = 0; i < outWeights.length; i++) {
-			for (int j = 0; j < outWeights[0].length; j++) {
-				System.out.print(outWeights[i][j]+"\t");
-			}
-			System.out.println();
-		}
-
+        printArray(inWeights);
+    	System.out.println("====================================");
+       
         ///// (3) Main loop to compute scores /////
         boolean changed = true;
 
@@ -114,7 +110,7 @@ public class Main {
 
             for(Page p : pages){
             	
-//            	System.out.println("==================================================================");
+//            	  System.out.println("==================================================================");
 //                System.out.println("----- " + p.title + " -----");
 //                System.out.println("p.base: " + p.base);
 //                System.out.println("f param: " + f_param);
@@ -123,7 +119,7 @@ public class Main {
                 for(int j=0; j<n; j++){
 //                System.out.print(outWeights[j][lookup.get(p.title)] + "\t | \t");
 //                System.out.print(pages.get(j).score + "\n");
-                    q_sum += (outWeights[lookup.get(p.title)][j] * pages.get(j).score);
+                    q_sum += (outWeights[lookup.get(p.title)][j] * inWeights[lookup.get(p.title)][j] * pages.get(j).score);
                 }
 
 //              System.out.println("q_sum: " + q_sum + "\n");
@@ -165,9 +161,6 @@ public class Main {
             System.out.print(String.format("%-15s", pages.get(j).title));
                     System.out.println(pages.get(j).score);
         }
-
-
-
     }
 
 
@@ -184,45 +177,59 @@ public class Main {
         return score;
     }
 
-
-
+    private static ArrayList<Page> getInboundLinksIntoPages(ArrayList<Page> pages) {
+    	Page[] arrayPages = pages.toArray(new Page[pages.size()]);
+    	for (int i = 0; i < arrayPages.length; i++) {
+			Link[] arrayLinks = arrayPages[i].outlinks.toArray(new Link[arrayPages[i].outlinks.size()]);
+			for (int j = 0; j < arrayLinks.length; j++) {
+				for (int k = 0; k < arrayPages.length; k++) {
+					if(arrayPages[k].title.equals(arrayLinks[j].to)) {
+						arrayPages[k].inlinks.add(arrayLinks[j].reverse());
+					}
+				}
+			}
+		}
+    	return pages;
+    }
+    
     //count the number of docs there are, initialize an array of Page objects, for each page object compute a wordcount/score
     private static ArrayList<Page> processInputPages(String input_path) throws IOException {
 
         ArrayList<Page> pages = new ArrayList<>();
         File dir = new File(input_path);
         File[] directoryListing = dir.listFiles();
-
+        
+        // Iterate through all the files in the directory
         if (directoryListing != null) {
             for (File child : directoryListing) {
 
-                // create a Page object from child file, extract name of page
+                // Create a Page object from child file, extract name of page
                 Page p = new Page(child.getName().replaceFirst("[.][^.]+$", ""));
 
-                // create an outlinks array for the page
+                // Create an outlinks array for the page
                 Document doc = Jsoup.parse(child, "UTF-8");
                 Elements links = doc.select("a[href]");
-
+                
+                // Iterate through all possible links
                 for(Element link : links){
-
+                	
+                	// Get the name of the file to which this current file links
                 	String x = link.attr("href").replaceFirst("[.][^.]+$", "");
+                	
+                	// Create a link corresponding to this outlink
                 	Link outLinks = new Link(p.title, x);
-                	Link inLinks = new Link(x,p.title);
-                    // give link a "bold" flag if it is in a header or bold tag
 
+                	// Code to determine the importance of the hyperlink
                     String parent_tag = link.parent().tagName();
                     if(parent_tag.equals("b") || parent_tag.equals("em") || parent_tag.equals("h1") || parent_tag.equals("h2") || parent_tag.equals("h3") || parent_tag.equals("h4")){
                         outLinks.isBold = true;
                     }
-
-                    p.outlinks.add(outLinks);
-                    p.inlinks.add(inLinks);
                     
-
+                    // Add this link to the outlinks for the page
+                    p.outlinks.add(outLinks);
                 }
 
-                // get the document's wordcount and initialize its base val
-                
+                // Get the document's total Word count and initialize its base value
                 p.wordcount = doc.text().split(" +").length;
                 p.base = (float) (Math.log(p.wordcount) / Math.log(2));
                 //System.out.println("P.BASE: " + p.base);
@@ -234,7 +241,6 @@ public class Main {
                 // add an index for the page
                 lookup.put(p.title, n);
                 
-
                 //increment page count
                 n++;
             }
@@ -245,6 +251,7 @@ public class Main {
         return pages;
     }
     
+    // Helper function to print any 2D Float function
     static void printArray(float[][] x) {
     	for (int i = 0; i < x.length; i++) {
 			for (int j = 0; j < x[0].length; j++) {
@@ -254,7 +261,7 @@ public class Main {
 		}
     }
 
-
+    // Function to read in input
     private static void getInput(String[] args){
         for(int i=0; i<args.length; i++){
             switch(args[i]){
