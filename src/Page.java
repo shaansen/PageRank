@@ -27,7 +27,7 @@ public class Page {
 
     public String toString(){
 //        return this.title + ":" + this.outlinks.toString() + this.wordcount + "\n";
-        return "\n" + this.title + "\n" + this.outlinks.toString() + "\n" + this.inlinks.toString() + "\n" + this.wordcount + "\n" + this.score;
+        return "\nTitle:" + this.title + "\nOutlinks:" + this.outlinks.toString() + "\nInlinks:" + this.inlinks.toString() + "\nWord Count:" + this.wordcount + "\nScore:" + this.score + "\n--------------------------------------------------------------------------------------------------------\n";
     }
 
 

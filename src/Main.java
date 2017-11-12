@@ -27,22 +27,17 @@ public class Main {
         pages 		= processInputPages(input_path);
         epsilon 	= (float) 0.01/n;
         pages		= getInboundLinksIntoPages(pages);
-        
-        
         // Calculate Total Score for all Pages
         for(Page p : pages){
         	sum_base += p.base;
         }
-        
         // Use Total Score above to get the normalized score
         for(Page p : pages){ 
         	p.score = p.base = p.base / sum_base; 
         }
- 
         // Declaration of Inweights and Outweights
         outWeights = new float[n][n];
-        inWeights = new float[n][n];
-        
+        inWeights  = new float[n][n];
         for(Page p : pages){
         	// if page has no outlinks, then assign w[p] a weight of 1/n for all q
         	if(p.outlinks.size() == 0){
@@ -50,7 +45,6 @@ public class Main {
                     outWeights[j][lookup.get(p.title)] = (float) 1.0/n;
                 }
             }
-            	
         	// compute link outWeights
             else{
                 // get unnormalized outWeights
@@ -67,10 +61,7 @@ public class Main {
                 for(int j=0; j<n; j++){
                     outWeights[j][lookup.get(p.title)] = outWeights[j][lookup.get(p.title)] / sum;
                 }
-                
             }
-        	
-        	
         	
         	// if page has no inlinks, then assign w[p] a weight of 1/n for all q
         	if(p.inlinks.size() == 0){
@@ -95,12 +86,8 @@ public class Main {
                 for(int j=0; j<n; j++){
                     inWeights[j][lookup.get(p.title)] = inWeights[j][lookup.get(p.title)] / sum;
                 }
-                
             }        	
         }
-        
-        printArray(inWeights);
-    	System.out.println("====================================");
        
         ///// (3) Main loop to compute scores /////
         boolean changed = true;
@@ -109,47 +96,19 @@ public class Main {
             changed = false;
 
             for(Page p : pages){
-            	
-//            	  System.out.println("==================================================================");
-//                System.out.println("----- " + p.title + " -----");
-//                System.out.println("p.base: " + p.base);
-//                System.out.println("f param: " + f_param);
-
                 float q_sum = 0;
                 for(int j=0; j<n; j++){
-//                System.out.print(outWeights[j][lookup.get(p.title)] + "\t | \t");
-//                System.out.print(pages.get(j).score + "\n");
-                    q_sum += (outWeights[lookup.get(p.title)][j] * inWeights[lookup.get(p.title)][j] * pages.get(j).score);
+                    q_sum += (outWeights[j][lookup.get(p.title)] * inWeights[j][lookup.get(p.title)] * pages.get(j).score);
                 }
-
-//              System.out.println("q_sum: " + q_sum + "\n");
-
-                p.newscore = (1 - f_param) * p.base + f_param * q_sum;
-
-//              System.out.println("newscore: " + p.newscore);
-
+                p.newscore = (1 - f_param) + f_param * q_sum;
                 if (Math.abs(p.newscore - p.score) > epsilon){
-//                  System.out.println("DIFF: " + Math.abs(p.newscore - p.score));
                     changed = true;
                 }
-
             }
-
-            //initialize scores
             for(Page p : pages){
                 p.score = p.newscore;
             }
         }
-
-
-
-
-        ///// (*) PRINT DEBUGGING INFO /////
-
-//        System.out.println("\n-------------------------------------\n");
-//        Util.print2DArray(outWeights);
-//        System.out.println(pages.toString());
-
 
         Collections.sort(pages, new Comparator<Page>() {
             public int compare(Page p1, Page p2) {
@@ -163,17 +122,13 @@ public class Main {
         }
     }
 
-
-
     // compute a weight given a link (l) and a page (p)
     private static int calculateWeight(Link l, Page p){
 
         int score = 1;
-
         if(l.isBold){
             score++;
         }
-
         return score;
     }
 
@@ -277,13 +232,7 @@ public class Main {
                     throw new IllegalArgumentException("Must provide arguments: " + "-docs [input path] -f [F parameter]");
             }
         }
-
-//        System.out.println("-docs: " + input_path);
-//        System.out.println("-f: " + f_param);
-
     }
-
-
 }
 
 
