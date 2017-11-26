@@ -26,9 +26,11 @@ public class Main {
         getInput(args);
         input_path 	= ".\\input";
         String query = "Bear";
+		String domain = "com";
         f_param 	= (float)0.7;
         pages 		= processInputPages(input_path,query);
         processURLLog(query);
+		processDomain(domain);
         epsilon 	= (float) 0.01/n;
         pages		= getInboundLinksIntoPages(pages);
         history_pages = processHistoryPages(pages);
@@ -39,6 +41,8 @@ public class Main {
         calculateHistoryScore();
         System.out.println("---------------------------------------------------");
         calculateContentScore(query);
+		System.out.println("---------------------------------------------------");
+        calculateDomainScore();
         
     }
 
@@ -155,7 +159,7 @@ public class Main {
 
                 // Create a Page object from child file, extract name of page
                 Page p = new Page(child.getName().replaceFirst("[.][^.]+$", ""));
-
+				p.domainScore = 0;
                 // Create an outlinks array for the page
                 Document doc = Jsoup.parse(child, "UTF-8");
                 Elements links = doc.select("a[href]");
@@ -236,7 +240,22 @@ public class Main {
         return pages;
     }
     
-    
+    public static void calculateDomainScore() {
+        // Content Main loop computation
+    	System.out.println("Printing page Domain Score");
+        Collections.sort(pages, new Comparator<Page>() {
+            public int compare(Page p1, Page p2) {
+                return p1.domainScore > p2.domainScore ? -1 : 1;
+            }
+        });
+
+        for(int j=0; j<n; j++){
+            System.out.print(String.format("%-15s", pages.get(j).title));
+                    System.out.println(pages.get(j).domainScore);
+        }
+    }
+	
+	
     public static void calculateContentScore(String query) {
         // Content Main loop computation
     	System.out.println("Printing page Content Score");
@@ -386,7 +405,35 @@ public class Main {
         }
     }
 
-    
+	private static void processDomain(String domain) {
+		HashMap<String, Page> pageMap = new HashMap<String, Page>();
+    	for(Page p: pages) {
+    		pageMap.put(p.title,p);
+    	}
+		try{
+    		BufferedReader reader = new BufferedReader(new FileReader(".//input/domain_log"));
+    	    String line;
+    	    while ((line = reader.readLine()) != null)
+    	    {
+    	    	
+    	    	String[] lineElement = line.split("\\s");
+    	    	
+    	    	if(pageMap.containsKey(lineElement[0]) && lineElement[1].toLowerCase().contains(domain))
+        		{
+    	    		
+					p.domainScore = 1;
+        		}    	    	
+    	    }
+    	    reader.close();
+    	  }
+    	  catch (Exception e)
+    	  {
+    	    System.err.format("Exception occurred trying to read ");
+    	    e.printStackTrace();
+    	    return;
+    	  }
+		
+	}	
     private static void processURLLog(String query) {
     	HashMap<String, Page> pageMap = new HashMap<String, Page>();
     	for(Page p: pages) {
