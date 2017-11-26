@@ -325,8 +325,6 @@ public class Main {
                 	p.bodyKeywords = (n-bodyString.length())/query.length();
                 }
                 
-                System.out.println(p.linkKeywords+"->"+p.titleKeywords+"->"+p.bodyKeywords);
-                
                 // Iterate through all possible links
                 for(Element link : links){
                 	
