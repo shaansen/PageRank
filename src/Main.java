@@ -42,9 +42,9 @@ public class Main {
         	sum_base += p.base;
         }
         
-        // Use Total Score above to get the normalized score
+        // Use Total Score above to get the normalized popularityScore
         for(Page p : pages){ 
-        	p.score = p.base = p.base / sum_base; 
+        	p.popularityScore = p.base = p.base / sum_base; 
         }
  
         // Declaration of Inweights and Outweights
@@ -110,7 +110,7 @@ public class Main {
         printArray(inWeights);
     	System.out.println("====================================");
        
-        ///// (3) Main loop to compute scores /////
+        ///// (3) Main loop to compute popularityScores /////
         boolean changed = true;
 
         while(changed){
@@ -127,44 +127,44 @@ public class Main {
                 
                 for(int j=0; j<n; j++){
 //                System.out.print(outWeights[j][lookup.get(p.title)] + "\t | \t");
-//                System.out.print(pages.get(j).score + "\n");
-                    q_sum += (outWeights[lookup.get(p.title)][j] * inWeights[lookup.get(p.title)][j] * pages.get(j).score);
+//                System.out.print(pages.get(j).popularityScore + "\n");
+                    q_sum += (outWeights[lookup.get(p.title)][j] * inWeights[lookup.get(p.title)][j] * pages.get(j).popularityScore);
                  
                 }
 
 //              System.out.println("q_sum: " + q_sum + "\n");
 
-                p.newscore = (1 - f_param) * p.base + f_param * q_sum;
+                p.newpopularityScore = (1 - f_param) * p.base + f_param * q_sum;
                 
 
-//              System.out.println("newscore: " + p.newscore);
+//              System.out.println("newpopularityScore: " + p.newpopularityScore);
 
-                if (Math.abs(p.newscore - p.score) > epsilon){
-//                  System.out.println("DIFF: " + Math.abs(p.newscore - p.score));
+                if (Math.abs(p.newpopularityScore - p.popularityScore) > epsilon){
+//                  System.out.println("DIFF: " + Math.abs(p.newpopularityScore - p.popularityScore));
                     changed = true;
                 }
 
             }
 
-            //initialize scores
+            //initialize popularityScores
             for(Page p : pages){
-                p.score = p.newscore;
+                p.popularityScore = p.newpopularityScore;
             }
         }
         System.out.println("Printing page popularity Score");
         Collections.sort(pages, new Comparator<Page>() {
             public int compare(Page p1, Page p2) {
-                return p1.score > p2.score ? -1 : 1;
+                return p1.popularityScore > p2.popularityScore ? -1 : 1;
             }
         });
 
         for(int j=0; j<n; j++){
             System.out.print(String.format("%-15s", pages.get(j).title));
-                    System.out.println(pages.get(j).score);
+                    System.out.println(pages.get(j).popularityScore);
         }
 
         // History Main loop computation
-    ///// (3) Main loop to compute scores /////
+    ///// (3) Main loop to compute popularityScores /////
         boolean changedhistory = true;
 
         while(changedhistory){
@@ -181,28 +181,28 @@ public class Main {
                 float history_sum=0;
                 for(int j=0; j<n; j++){
 //                System.out.print(outWeights[j][lookup.get(p.title)] + "\t | \t");
-//                System.out.print(pages.get(j).score + "\n");
+//                System.out.print(pages.get(j).popularityScore + "\n");
                 
                     history_sum += pages.get(j).avgtime;
                 }
 
 //              System.out.println("q_sum: " + q_sum + "\n");
 
-                //p.newscore = (1 - f_param) * p.base + f_param * q_sum;
-                p.avgtimescore = (1 - f_param) * p.base + f_param * history_sum;
+                //p.newpopularityScore = (1 - f_param) * p.base + f_param * q_sum;
+                p.historyScore = (1 - f_param) * p.base + f_param * history_sum;
 
-//              System.out.println("newscore: " + p.newscore);
+//              System.out.println("newpopularityScore: " + p.newpopularityScore);
 
-                if (Math.abs(p.avgtimescore - p.score) > epsilon){
-//                  System.out.println("DIFF: " + Math.abs(p.newscore - p.score));
+                if (Math.abs(p.historyScore - p.popularityScore) > epsilon){
+//                  System.out.println("DIFF: " + Math.abs(p.newpopularityScore - p.popularityScore));
                     changedhistory = true;
                 }
 
             }
 
-            //initialize scores
+            //initialize popularityScores
             for(Page p : history_pages){
-                p.score = p.avgtimescore;
+                p.popularityScore = p.historyScore;
             }
         }
 
@@ -217,13 +217,13 @@ public class Main {
         System.out.println("Printing page history Score");
         Collections.sort(history_pages, new Comparator<Page>() {
             public int compare(Page p1, Page p2) {
-                return p1.score > p2.score ? -1 : 1;
+                return p1.popularityScore > p2.popularityScore ? -1 : 1;
             }
         });
 
         for(int j=0; j<n; j++){
             System.out.print(String.format("%-15s", history_pages.get(j).title));
-                    System.out.println(pages.get(j).score);
+                    System.out.println(pages.get(j).popularityScore);
         }
     }
 
@@ -232,13 +232,13 @@ public class Main {
     // compute a weight given a link (l) and a page (p)
     private static int calculateWeight(Link l, Page p){
 
-        int score = 1;
+        int popularityScore = 1;
 
         if(l.isBold){
-            score++;
+            popularityScore++;
         }
 
-        return score;
+        return popularityScore;
     }
 
     private static ArrayList<Page> getInboundLinksIntoPages(ArrayList<Page> pages) {
@@ -325,7 +325,7 @@ public class Main {
     	}
     	
     
-    //count the number of docs there are, initialize an array of Page objects, for each page object compute a wordcount/score
+    //count the number of docs there are, initialize an array of Page objects, for each page object compute a wordcount/popularityScore
     private static ArrayList<Page> processInputPages(String input_path) throws IOException {
 
         ArrayList<Page> pages = new ArrayList<>();
