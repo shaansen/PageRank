@@ -21,23 +21,74 @@ public class Main {
     private static Hashtable<String, Integer> lookup = new Hashtable<>();
     private static float outWeights[][];
     private static float inWeights[][];
+    
+    public static void calculateHistoryScore() {
+        // History Main loop computation
+    ///// (3) Main loop to compute popularityScores /////
+        boolean changedhistory = true;
 
-    public static void main(String[] args) throws IOException {
+        while(changedhistory){
+            changedhistory = false;
 
-        getInput(args);
-        input_path 	= ".\\input";
-        f_param 	= (float)0.7;
-        pages 		= processInputPages(input_path);
-        epsilon 	= (float) 0.01/n;
-        pages		= getInboundLinksIntoPages(pages);
-        //System.out.println(pages);
-        
-        //Calculate on the basis of history
-        
-        history_pages = processHistoryPages(pages);
-        System.out.println("Printing history pages:"+history_pages);
-        
-        // Calculate Total Score for all Pages
+            for(Page p : history_pages){
+            	
+//            	  System.out.println("==================================================================");
+//                System.out.println("----- " + p.title + " -----");
+//                System.out.println("p.base: " + p.base);
+//                System.out.println("f param: " + f_param);
+
+                
+                float history_sum=0;
+                for(int j=0; j<n; j++){
+//                System.out.print(outWeights[j][lookup.get(p.title)] + "\t | \t");
+//                System.out.print(pages.get(j).popularityScore + "\n");
+                
+                    history_sum += pages.get(j).avgtime;
+                }
+
+//              System.out.println("q_sum: " + q_sum + "\n");
+
+                //p.newpopularityScore = (1 - f_param) * p.base + f_param * q_sum;
+                p.historyScore = (1 - f_param) * p.base + f_param * history_sum;
+
+//              System.out.println("newpopularityScore: " + p.newpopularityScore);
+
+                if (Math.abs(p.historyScore - p.popularityScore) > epsilon){
+//                  System.out.println("DIFF: " + Math.abs(p.newpopularityScore - p.popularityScore));
+                    changedhistory = true;
+                }
+
+            }
+
+            //initialize popularityScores
+            for(Page p : history_pages){
+                p.popularityScore = p.historyScore;
+            }
+        }
+
+
+
+        ///// (*) PRINT DEBUGGING INFO /////
+
+//        System.out.println("\n-------------------------------------\n");
+//        Util.print2DArray(outWeights);
+//        System.out.println(pages.toString());
+
+        System.out.println("Printing page history Score");
+        Collections.sort(history_pages, new Comparator<Page>() {
+            public int compare(Page p1, Page p2) {
+                return p1.popularityScore > p2.popularityScore ? -1 : 1;
+            }
+        });
+
+        for(int j=0; j<n; j++){
+            System.out.print(String.format("%-15s", history_pages.get(j).title));
+                    System.out.println(pages.get(j).popularityScore);
+        }
+    }
+    
+    public static void calculatePopularityScore() {
+    	// Calculate Total Score for all Pages
         for(Page p : pages){
         	sum_base += p.base;
         }
@@ -106,9 +157,6 @@ public class Main {
                 
             }        	
         }
-        
-        printArray(inWeights);
-    	System.out.println("====================================");
        
         ///// (3) Main loop to compute popularityScores /////
         boolean changed = true;
@@ -162,69 +210,20 @@ public class Main {
             System.out.print(String.format("%-15s", pages.get(j).title));
                     System.out.println(pages.get(j).popularityScore);
         }
+    }
 
-        // History Main loop computation
-    ///// (3) Main loop to compute popularityScores /////
-        boolean changedhistory = true;
+    public static void main(String[] args) throws IOException {
 
-        while(changedhistory){
-            changedhistory = false;
-
-            for(Page p : history_pages){
-            	
-//            	  System.out.println("==================================================================");
-//                System.out.println("----- " + p.title + " -----");
-//                System.out.println("p.base: " + p.base);
-//                System.out.println("f param: " + f_param);
-
-                
-                float history_sum=0;
-                for(int j=0; j<n; j++){
-//                System.out.print(outWeights[j][lookup.get(p.title)] + "\t | \t");
-//                System.out.print(pages.get(j).popularityScore + "\n");
-                
-                    history_sum += pages.get(j).avgtime;
-                }
-
-//              System.out.println("q_sum: " + q_sum + "\n");
-
-                //p.newpopularityScore = (1 - f_param) * p.base + f_param * q_sum;
-                p.historyScore = (1 - f_param) * p.base + f_param * history_sum;
-
-//              System.out.println("newpopularityScore: " + p.newpopularityScore);
-
-                if (Math.abs(p.historyScore - p.popularityScore) > epsilon){
-//                  System.out.println("DIFF: " + Math.abs(p.newpopularityScore - p.popularityScore));
-                    changedhistory = true;
-                }
-
-            }
-
-            //initialize popularityScores
-            for(Page p : history_pages){
-                p.popularityScore = p.historyScore;
-            }
-        }
-
-
-
-        ///// (*) PRINT DEBUGGING INFO /////
-
-//        System.out.println("\n-------------------------------------\n");
-//        Util.print2DArray(outWeights);
-//        System.out.println(pages.toString());
-
-        System.out.println("Printing page history Score");
-        Collections.sort(history_pages, new Comparator<Page>() {
-            public int compare(Page p1, Page p2) {
-                return p1.popularityScore > p2.popularityScore ? -1 : 1;
-            }
-        });
-
-        for(int j=0; j<n; j++){
-            System.out.print(String.format("%-15s", history_pages.get(j).title));
-                    System.out.println(pages.get(j).popularityScore);
-        }
+        getInput(args);
+        input_path 	= ".\\input";
+        f_param 	= (float)0.7;
+        pages 		= processInputPages(input_path);
+        epsilon 	= (float) 0.01/n;
+        pages		= getInboundLinksIntoPages(pages);
+        history_pages = processHistoryPages(pages);
+        calculatePopularityScore();
+        calculateHistoryScore();
+        
     }
 
 
@@ -284,8 +283,6 @@ public class Main {
     	    	}
     	    	
     	    }
-    	    System.out.println("map size"+map.size());
-    	    
     	    reader.close();
     	    //return records;
     	  }
