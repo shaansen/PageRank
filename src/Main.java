@@ -45,7 +45,7 @@ public class Main {
             for(int j=0; j<n; j++){
                 history_sum += pages.get(j).avgtime;
             }
-            p.historyScore = (1 - f_param) * p.base + f_param * p.avgtime/history_sum;
+            p.historyScore = p.avgtime/history_sum;
         }
 
         System.out.println("Printing page history Score");
@@ -306,17 +306,26 @@ public class Main {
                 Elements titles = doc.select("title");
                 Elements body = doc.select("body");
                 
-                if(links.toString().contains(query)) {
-                	p.linkKeywords++;
+                String linkString = links.toString();
+                String titleString = titles.toString();
+                String bodyString = body.toString();
+                if(linkString.contains(query)) {
+                	int n = linkString.length();
+                	linkString = linkString.replaceAll(query, "");
+                	p.linkKeywords = (n-linkString.length())/query.length();
                 }
-                if(titles.toString().contains(query)) {
-                	p.titleKeywords++;
+                if(titleString.contains(query)) {
+                	int n = titleString.length();
+                	titleString = titleString.replaceAll(query, "");
+                	p.titleKeywords = (n-titleString.length())/query.length();
                 }
-                if(body.toString().contains(query)) {
-                	p.bodyKeywords++;
+                if(bodyString.contains(query)) {
+                	int n = bodyString.length();
+                	bodyString = bodyString.replaceAll(query, "");
+                	p.bodyKeywords = (n-bodyString.length())/query.length();
                 }
                 
-                
+                System.out.println(p.linkKeywords+"->"+p.titleKeywords+"->"+p.bodyKeywords);
                 
                 // Iterate through all possible links
                 for(Element link : links){
@@ -340,11 +349,11 @@ public class Main {
 
                 // Get the document's total Word count and initialize its base value
                 p.wordcount = doc.text().split(" +").length;
-                /*if(p.wordcount!=0) {
+                if(p.wordcount!=0) {
 	                p.linkKeywords /= p.wordcount;
 	                p.titleKeywords /= p.wordcount;
 	                p.bodyKeywords /= p.wordcount;
-                }*/
+                }
                 p.contentScore = (p.linkKeywords+p.titleKeywords+p.bodyKeywords+p.urlKeywords)/4;
                 p.base = (float) (Math.log(p.wordcount) / Math.log(2));
                 //System.out.println("P.BASE: " + p.base);
