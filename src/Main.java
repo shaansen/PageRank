@@ -25,7 +25,7 @@ public class Main {
     	
         getInput(args);
         input_path 	= ".\\input";
-        String query = "Bear";
+        String query = "ABCDEDSDFSDFSDFDSFSDFS";
         f_param 	= (float)0.7;
         pages 		= processInputPages(input_path,query);
         processURLLog(query);
