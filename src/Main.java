@@ -185,8 +185,6 @@ public class Main {
         
     }
 
-
-
     // compute a weight given a link (l) and a page (p)
     private static int calculateWeight(Link l, Page p){
 
@@ -309,6 +307,11 @@ public class Main {
                 String linkString = links.toString();
                 String titleString = titles.toString();
                 String bodyString = body.toString();
+                
+                int t1 = linkString.split(" ").length;
+                int t2 = titleString.split(" ").length;
+                int t3 = bodyString.split(" ").length;
+                
                 if(linkString.contains(query)) {
                 	int n = linkString.length();
                 	linkString = linkString.replaceAll(query, "");
@@ -347,10 +350,13 @@ public class Main {
 
                 // Get the document's total Word count and initialize its base value
                 p.wordcount = doc.text().split(" +").length;
+                System.out.println(p.linkKeywords+"/"+t1);
+                System.out.println(p.titleKeywords+"/"+t2);
+                System.out.println(p.bodyKeywords+"/"+t3);
                 if(p.wordcount!=0) {
-	                p.linkKeywords /= p.wordcount;
-	                p.titleKeywords /= p.wordcount;
-	                p.bodyKeywords /= p.wordcount;
+	                p.linkKeywords /= t1;
+	                p.titleKeywords /= t2;
+	                p.bodyKeywords /= t3;
                 }
                 p.contentScore = (p.linkKeywords+p.titleKeywords+p.bodyKeywords+p.urlKeywords)/4;
                 p.base = (float) (Math.log(p.wordcount) / Math.log(2));
