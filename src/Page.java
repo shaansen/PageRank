@@ -9,9 +9,11 @@ public class Page {
     public float base;
     public float score;
     public float newscore;
+    
     public ArrayList<Link> outlinks;
     public ArrayList<Link> inlinks;
-
+    public float avgtime;
+    public float avgtimescore;
 
     public Page(String title){
 
@@ -22,12 +24,16 @@ public class Page {
         this.newscore = 0;
         this.outlinks = new ArrayList<>();
         this.inlinks = new ArrayList<>();
+        this.avgtime=0;
+        this.avgtimescore = 0;
+        
 
     }
 
     public String toString(){
 //        return this.title + ":" + this.outlinks.toString() + this.wordcount + "\n";
-        return "\nTitle:" + this.title + "\nOutlinks:" + this.outlinks.toString() + "\nInlinks:" + this.inlinks.toString() + "\nWord Count:" + this.wordcount + "\nScore:" + this.score + "\n--------------------------------------------------------------------------------------------------------\n";
+    	System.out.println( "\n" + this.title + "\n" + this.outlinks.toString() + "\n" + this.inlinks.toString() + "\n" + this.wordcount + "\n" + this.score);
+        return "\n" + this.title + "\n" + this.outlinks.toString() + "\n" + this.inlinks.toString() + "\n" + this.wordcount + "\n" + this.score + "\n" + this.avgtime;
     }
 
 
