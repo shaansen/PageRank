@@ -2,7 +2,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -22,68 +21,43 @@ public class Main {
     private static float outWeights[][];
     private static float inWeights[][];
     
+    public static void calculateContentScore(String query) {
+        // Content Main loop computation
+        System.out.println("Printing page Content Score");
+        
+        Collections.sort(pages, new Comparator<Page>() {
+            public int compare(Page p1, Page p2) {
+                return p1.contentScore > p2.contentScore ? -1 : 1;
+            }
+        });
+
+        for(int j=0; j<n; j++){
+            System.out.print(String.format("%-15s", pages.get(j).title));
+                    System.out.println(pages.get(j).contentScore);
+        }
+    }
+    
     public static void calculateHistoryScore() {
         // History Main loop computation
-    ///// (3) Main loop to compute popularityScores /////
-        boolean changedhistory = true;
+        for(Page p : history_pages){
+            float history_sum=0;
 
-        while(changedhistory){
-            changedhistory = false;
-
-            for(Page p : history_pages){
-            	
-//            	  System.out.println("==================================================================");
-//                System.out.println("----- " + p.title + " -----");
-//                System.out.println("p.base: " + p.base);
-//                System.out.println("f param: " + f_param);
-
-                
-                float history_sum=0;
-                for(int j=0; j<n; j++){
-//                System.out.print(outWeights[j][lookup.get(p.title)] + "\t | \t");
-//                System.out.print(pages.get(j).popularityScore + "\n");
-                
-                    history_sum += pages.get(j).avgtime;
-                }
-
-//              System.out.println("q_sum: " + q_sum + "\n");
-
-                //p.newpopularityScore = (1 - f_param) * p.base + f_param * q_sum;
-                p.historyScore = (1 - f_param) * p.base + f_param * history_sum;
-
-//              System.out.println("newpopularityScore: " + p.newpopularityScore);
-
-                if (Math.abs(p.historyScore - p.popularityScore) > epsilon){
-//                  System.out.println("DIFF: " + Math.abs(p.newpopularityScore - p.popularityScore));
-                    changedhistory = true;
-                }
-
+            for(int j=0; j<n; j++){
+                history_sum += pages.get(j).avgtime;
             }
-
-            //initialize popularityScores
-            for(Page p : history_pages){
-                p.popularityScore = p.historyScore;
-            }
+            p.historyScore = (1 - f_param) * p.base + f_param * p.avgtime/history_sum;
         }
-
-
-
-        ///// (*) PRINT DEBUGGING INFO /////
-
-//        System.out.println("\n-------------------------------------\n");
-//        Util.print2DArray(outWeights);
-//        System.out.println(pages.toString());
 
         System.out.println("Printing page history Score");
         Collections.sort(history_pages, new Comparator<Page>() {
             public int compare(Page p1, Page p2) {
-                return p1.popularityScore > p2.popularityScore ? -1 : 1;
+                return p1.historyScore > p2.historyScore ? -1 : 1;
             }
         });
 
         for(int j=0; j<n; j++){
             System.out.print(String.format("%-15s", history_pages.get(j).title));
-                    System.out.println(pages.get(j).popularityScore);
+                    System.out.println(pages.get(j).historyScore);
         }
     }
     
@@ -165,33 +139,15 @@ public class Main {
             changed = false;
 
             for(Page p : pages){
-            	
-//            	  System.out.println("==================================================================");
-//                System.out.println("----- " + p.title + " -----");
-//                System.out.println("p.base: " + p.base);
-//                System.out.println("f param: " + f_param);
-
                 float q_sum = 0;
-                
                 for(int j=0; j<n; j++){
-//                System.out.print(outWeights[j][lookup.get(p.title)] + "\t | \t");
-//                System.out.print(pages.get(j).popularityScore + "\n");
                     q_sum += (outWeights[lookup.get(p.title)][j] * inWeights[lookup.get(p.title)][j] * pages.get(j).popularityScore);
-                 
                 }
-
-//              System.out.println("q_sum: " + q_sum + "\n");
-
                 p.newpopularityScore = (1 - f_param) * p.base + f_param * q_sum;
                 
-
-//              System.out.println("newpopularityScore: " + p.newpopularityScore);
-
                 if (Math.abs(p.newpopularityScore - p.popularityScore) > epsilon){
-//                  System.out.println("DIFF: " + Math.abs(p.newpopularityScore - p.popularityScore));
                     changed = true;
                 }
-
             }
 
             //initialize popularityScores
@@ -213,16 +169,19 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
-
+    	
+    	
         getInput(args);
         input_path 	= ".\\input";
+        String query = "ocean";
         f_param 	= (float)0.7;
-        pages 		= processInputPages(input_path);
+        pages 		= processInputPages(input_path,query);
         epsilon 	= (float) 0.01/n;
         pages		= getInboundLinksIntoPages(pages);
         history_pages = processHistoryPages(pages);
         calculatePopularityScore();
         calculateHistoryScore();
+        calculateContentScore(query);
         
     }
 
@@ -320,10 +279,9 @@ public class Main {
     	}
     	return pages;
     	}
-    	
     
     //count the number of docs there are, initialize an array of Page objects, for each page object compute a wordcount/popularityScore
-    private static ArrayList<Page> processInputPages(String input_path) throws IOException {
+    private static ArrayList<Page> processInputPages(String input_path,String query) throws IOException {
 
         ArrayList<Page> pages = new ArrayList<>();
         ArrayList<File> htmlfiles = new ArrayList<>();
@@ -345,11 +303,26 @@ public class Main {
                 // Create an outlinks array for the page
                 Document doc = Jsoup.parse(child, "UTF-8");
                 Elements links = doc.select("a[href]");
+                Elements titles = doc.select("title");
+                Elements body = doc.select("body");
+                
+                if(links.toString().contains(query)) {
+                	p.linkKeywords++;
+                }
+                if(titles.toString().contains(query)) {
+                	p.titleKeywords++;
+                }
+                if(body.toString().contains(query)) {
+                	p.bodyKeywords++;
+                }
+                
+                
                 
                 // Iterate through all possible links
                 for(Element link : links){
                 	
                 	// Get the name of the file to which this current file links
+                	
                 	String x = link.attr("href").replaceFirst("[.][^.]+$", "");
                 	
                 	// Create a link corresponding to this outlink
@@ -367,6 +340,12 @@ public class Main {
 
                 // Get the document's total Word count and initialize its base value
                 p.wordcount = doc.text().split(" +").length;
+                /*if(p.wordcount!=0) {
+	                p.linkKeywords /= p.wordcount;
+	                p.titleKeywords /= p.wordcount;
+	                p.bodyKeywords /= p.wordcount;
+                }*/
+                p.contentScore = (p.linkKeywords+p.titleKeywords+p.bodyKeywords+p.urlKeywords)/4;
                 p.base = (float) (Math.log(p.wordcount) / Math.log(2));
                 //System.out.println("P.BASE: " + p.base);
 
