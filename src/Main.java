@@ -25,8 +25,8 @@ public class Main {
     	
         getInput(args);
         input_path 	= ".\\input";
-        String query = "Bear";
-		String domain = "com";
+        String query = "north";
+		String domain = ".org";
 
         f_param 	= (float)0.7;
         pages 		= processInputPages(input_path,query);
@@ -36,15 +36,18 @@ public class Main {
         pages		= getInboundLinksIntoPages(pages);
         history_pages = processHistoryPages(pages);
         
-        
+        long startTime = System.nanoTime();
+
         calculatePopularityScore();
-        System.out.println("---------------------------------------------------");
+        //System.out.println("---------------------------------------------------");
         calculateHistoryScore();
-        System.out.println("---------------------------------------------------");
+        //System.out.println("---------------------------------------------------");
         calculateContentScore(query);
-		System.out.println("---------------------------------------------------");
+		//System.out.println("---------------------------------------------------");
         calculateDomainScore();
-        
+        long endTime = System.nanoTime();
+        long duration = endTime - startTime;
+        System.out.println(duration);        
     }
 
     // compute a weight given a link (l) and a page (p)
@@ -85,10 +88,10 @@ public class Main {
     	    String line;
     	    while ((line = reader.readLine()) != null)
     	    {
-    	      //System.out.println(line);
+    	      ////System.out.println(line);
     	    	//records.add(line);
     	    	String[] recordinfo = line.split("\\s");
-    	    	//System.out.println(recordinfo[2]);
+    	    	////System.out.println(recordinfo[2]);
     	    	if(!map.containsKey(recordinfo[1]))
         		{
         			map.put(recordinfo[1],new ArrayList<Integer>());
@@ -123,18 +126,21 @@ public class Main {
     	float total_avg = 0;
     	for(Map.Entry<String,Float> entry : avgtime.entrySet())
     	{
-    		//System.out.println("File "+entry.getKey()+"avg time:"+entry.getValue());
+    		////System.out.println("File "+entry.getKey()+"avg time:"+entry.getValue());
     		total_avg = total_avg + entry.getValue();
     	}
     	for(Map.Entry<String,Float> entry : avgtime.entrySet())
     	{
-    		//System.out.println("File "+entry.getKey()+"avg time:"+entry.getValue());
+    		////System.out.println("File "+entry.getKey()+"avg time:"+entry.getValue());
     		entry.setValue(entry.getValue()/total_avg);
     	}
     	for(int k=0;k<pages.size();k++)
     	{
-    		//System.out.println("page object"+pages.get(k).title);
+    		////System.out.println("page object"+pages.get(k).title);
     		String htmlname = pages.get(k).title+".html";
+    		if(avgtime.get(htmlname)==null) {
+    			avgtime.put(htmlname, (float)0);
+    		}
     		pages.get(k).avgtime = avgtime.get(htmlname); 
     	}
     	return pages;
@@ -213,16 +219,16 @@ public class Main {
 
                 // Get the document's total Word count and initialize its base value
                 p.wordcount = doc.text().split(" +").length;
-//                System.out.println(p.linkKeywords+"/"+t1);
-//                System.out.println(p.titleKeywords+"/"+t2);
-//                System.out.println(p.bodyKeywords+"/"+t3);
+//                //System.out.println(p.linkKeywords+"/"+t1);
+//                //System.out.println(p.titleKeywords+"/"+t2);
+//                //System.out.println(p.bodyKeywords+"/"+t3);
                 if(p.wordcount!=0) {
 	                p.linkKeywords /= t1;
 	                p.titleKeywords /= t2;
 	                p.bodyKeywords /= t3;
                 }
                 p.base = (float) (Math.log(p.wordcount) / Math.log(2));
-                //System.out.println("P.BASE: " + p.base);
+                ////System.out.println("P.BASE: " + p.base);
 
                 // store page object in page array
                 pages.add(p);
@@ -235,7 +241,7 @@ public class Main {
                 n++;
             }
         } else {
-            System.out.println(input_path + " is not a valid directory");
+            //System.out.println(input_path + " is not a valid directory");
         }
 
         return pages;
@@ -243,35 +249,35 @@ public class Main {
     
     public static void calculateDomainScore() {
         // Content Main loop computation
-    	System.out.println("Printing page Domain Score");
-        Collections.sort(pages, new Comparator<Page>() {
-            public int compare(Page p1, Page p2) {
-                return p1.domainScore > p2.domainScore ? -1 : 1;
-            }
-        });
+    	//System.out.println("Printing page Domain Score");
+//        Collections.sort(pages, new Comparator<Page>() {
+//            public int compare(Page p1, Page p2) {
+//                return p1.domainScore > p2.domainScore ? -1 : 1;
+//            }
+//        });
 
         for(int j=0; j<n; j++){
-            System.out.print(String.format("%-15s", pages.get(j).title));
-                    System.out.println(pages.get(j).domainScore);
+            //System.out.print(String.format("%-15s", pages.get(j).title));
+                    //System.out.println(pages.get(j).domainScore);
         }
     }
 	
 	
     public static void calculateContentScore(String query) {
         // Content Main loop computation
-    	System.out.println("Printing page Content Score");
+    	//System.out.println("Printing page Content Score");
         for(Page p: pages) {
         	p.contentScore = (p.linkKeywords+p.titleKeywords+p.bodyKeywords+p.urlKeywords)/4;
         }
-        Collections.sort(pages, new Comparator<Page>() {
-            public int compare(Page p1, Page p2) {
-                return p1.contentScore > p2.contentScore ? -1 : 1;
-            }
-        });
+//        Collections.sort(pages, new Comparator<Page>() {
+//            public int compare(Page p1, Page p2) {
+//                return p1.contentScore > p2.contentScore ? -1 : 1;
+//            }
+//        });
 
         for(int j=0; j<n; j++){
-            System.out.print(String.format("%-15s", pages.get(j).title));
-                    System.out.println(pages.get(j).contentScore);
+            //System.out.print(String.format("%-15s", pages.get(j).title));
+                    //System.out.println(pages.get(j).contentScore);
         }
     }
     
@@ -286,16 +292,16 @@ public class Main {
             p.historyScore = p.avgtime/history_sum;
         }
 
-        System.out.println("Printing page history Score");
-        Collections.sort(history_pages, new Comparator<Page>() {
-            public int compare(Page p1, Page p2) {
-                return p1.historyScore > p2.historyScore ? -1 : 1;
-            }
-        });
+        //System.out.println("Printing page history Score");
+//        Collections.sort(history_pages, new Comparator<Page>() {
+//            public int compare(Page p1, Page p2) {
+//                return p1.historyScore > p2.historyScore ? -1 : 1;
+//            }
+//        });
 
         for(int j=0; j<n; j++){
-            System.out.print(String.format("%-15s", history_pages.get(j).title));
-                    System.out.println(pages.get(j).historyScore);
+            //System.out.print(String.format("%-15s", history_pages.get(j).title));
+                    //System.out.println(pages.get(j).historyScore);
         }
     }
     
@@ -326,6 +332,13 @@ public class Main {
             else{
                 // get unnormalized outWeights
             	for(Link l : p.outlinks){
+            		if(lookup.get(l.to)==null) {
+            			lookup.put(l.to,0);
+            		}
+            		if(lookup.get(l.from)==null) {
+            			lookup.put(l.from,0);
+            		}
+            		
             		outWeights[lookup.get(l.to)][lookup.get(l.from)] += calculateWeight(l, p);
                 }
             	//get sum
@@ -393,16 +406,16 @@ public class Main {
                 p.popularityScore = p.newpopularityScore;
             }
         }
-        System.out.println("Printing page popularity Score");
-        Collections.sort(pages, new Comparator<Page>() {
-            public int compare(Page p1, Page p2) {
-                return p1.popularityScore > p2.popularityScore ? -1 : 1;
-            }
-        });
+        //System.out.println("Printing page popularity Score");
+//        Collections.sort(pages, new Comparator<Page>() {
+//            public int compare(Page p1, Page p2) {
+//                return p1.popularityScore > p2.popularityScore ? -1 : 1;
+//            }
+//        });
 
         for(int j=0; j<n; j++){
-            System.out.print(String.format("%-15s", pages.get(j).title));
-                    System.out.println(pages.get(j).popularityScore);
+            //System.out.print(String.format("%-15s", pages.get(j).title));
+                    //System.out.println(pages.get(j).popularityScore);
         }
     }
 
@@ -477,9 +490,9 @@ public class Main {
     static void printArray(float[][] x) {
     	for (int i = 0; i < x.length; i++) {
 			for (int j = 0; j < x[0].length; j++) {
-				System.out.print(x[i][j]+"\t");
+				//System.out.print(x[i][j]+"\t");
 			}
-			System.out.println();
+			//System.out.println();
 		}
     }
 
@@ -500,8 +513,8 @@ public class Main {
             }
         }
 
-//        System.out.println("-docs: " + input_path);
-//        System.out.println("-f: " + f_param);
+//        //System.out.println("-docs: " + input_path);
+//        //System.out.println("-f: " + f_param);
 
     }
 
