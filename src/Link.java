@@ -1,4 +1,5 @@
-
+/*Function : Helper class to calculate popularity of pages in main function 
+ * */
 public class Link {
 
     public String from;
@@ -17,12 +18,13 @@ public class Link {
         return "(" + this.from + ", " + this.to + ")";
     }
     
+    //Check for reversal of links
     public Link reverse() {
     	Link reverse = new Link(this.to, this.from);
     	return reverse;
     }
 
-
+    //Check for link equality
     @Override
     public boolean equals(Object o){
 
@@ -36,8 +38,6 @@ public class Link {
         Link l = (Link) o;
 
         return this.to.equals(l.to) && this.from.equals(l.from);
-
-
     }
 
 }

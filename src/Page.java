@@ -1,6 +1,8 @@
+/*Helper class for Page calculations. It stores all required information about the pages
+ * Authors : Akanksha Bhosale, Shantanu Sengupta, Isha Potnis  
+ * */
+
 import java.util.ArrayList;
-
-
 
 public class Page {
 
@@ -52,11 +54,10 @@ public class Page {
         // Initializing Domain Variables
         this.domainScore = 0;
         this.url = "";        
-
     }
 
+    //Function to print information about the page
     public String toString(){
-//        return this.title + ":" + this.outlinks.toString() + this.wordcount + "\n";
     	System.out.println("Page :\t\t "+this.title);
     	System.out.println("Popularity :\t "+this.popularityScore);
     	System.out.println("History :\t "+this.historyScore);
@@ -69,6 +70,4 @@ public class Page {
     	
     	return "-----------------------------------------";
     }
-
-
 }

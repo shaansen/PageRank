@@ -1,4 +1,8 @@
-
+/* Function :Java class to print output in matrix form.
+ * Input    : 2D array of floats for normalized values of pages based on scores of the weighted factors
+ * Display  : Matrix representation of the array
+ * Sources  : https://github.com/yfeng55/Weighted-Pagerank
+ * */
 public class Util {
 
     public static void print2DArray(float [][] array){
