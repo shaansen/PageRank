@@ -19,8 +19,8 @@ import java.io.File;
 
 public class Main {
 
-    private static String input_path;   // -docs
-    private static float f_param;       // -f (probability of tails)
+    private static String input_path;   
+    private static float f_param;       
     private static ArrayList<Page> pages;
     private static ArrayList<Page> history_pages;
     private static int n = 0;
@@ -48,12 +48,9 @@ public class Main {
         long startTime = System.nanoTime();
 
         calculatePopularityScore();
-        //System.out.println("---------------------------------------------------");
         calculateHistoryScore();
-        //System.out.println("---------------------------------------------------");
         calculateContentScore(query);
-		//System.out.println("---------------------------------------------------");
-        calculateDomainScore();
+		calculateDomainScore();
         long endTime = System.nanoTime();
         long duration = endTime - startTime;
         System.out.println(duration);        
