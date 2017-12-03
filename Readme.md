@@ -14,7 +14,19 @@ In the PageRank Algorithm, the rank of a page is dependent only on the number of
 ##### Project Setup
 
 ##### How to run the code
-
+#### Compile and Run:
+##### 1. run javac and specify external jars
+```sh
+javac ­cp "./jars/*" *.java
+```
+##### 2. run program
+```sh
+java ­cp ".:./jars/*" Main ­f [F parameter] ­docs [input directory]
+```
+##### Example:
+```sh
+java ­cp ".:./jars/*" Main ­f 0.7 ­docs ./input
+```
 
 ### References
 - https://github.com/yfeng55/Weighted-Pagerank
