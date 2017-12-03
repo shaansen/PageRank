@@ -13,8 +13,8 @@ In the PageRank Algorithm, the rank of a page is dependent only on the number of
 
 ##### Project Setup
 ##### 1. Git clone or download the repository into your local machine
-```sh
 Commands for cloning into through git:
+```sh
 git clone https://github.com/shaansen/PageRank.git
 ```
 ```sh
@@ -25,12 +25,12 @@ If you download the ZIP folder, unzip it.
 ##### 3. Include the jsoup jar into the build path variables.
 
 ##### 4. Run the .py files in Python compiler to generate history_log and domain_log files
-```sh
 Commands for generating history_log:
+```sh
 python ./generatelog.py
 ```
-```sh
 Commands for generating domain_log:
+```sh
 python ./mydomainlog.py
 ```
 Include both the generated files in input folder
