@@ -234,16 +234,30 @@ public class Main {
     }
     
     public static void calculateContentScore(String query) {
-        // Content Main loop computation
-    	//System.out.println("Printing page Content Score");
+    	 
+    	System.out.println("Printing page Content Score");
         for(Page p: pages) {
         	p.contentScore = (p.linkKeywords+p.titleKeywords+p.bodyKeywords+p.urlKeywords)/4;
+        }
+        Collections.sort(pages, new Comparator<Page>() {
+            public int compare(Page p1, Page p2) {
+                return p1.contentScore > p2.contentScore ? -1 : 1;
+            }
+        });
+
+        for(int j=0; j<n; j++){
+            System.out.print(String.format("%-15s", pages.get(j).title));
+            System.out.println(pages.get(j).contentScore);
         }
     }
 
     public static void calculateDomainScore() {
-        // Content Main loop computation
-    	//System.out.println("Printing page Domain Score");
+    	 System.out.println("Printing page Domain Score");
+         Collections.sort(pages, new Comparator<Page>() {
+            public int compare(Page p1, Page p2) {
+                return p1.domainScore > p2.domainScore ? -1 : 1;
+            }
+        });
         for(int j=0; j<n; j++){
             System.out.print(String.format("%-15s", pages.get(j).title));
             System.out.println(pages.get(j).domainScore);
@@ -259,6 +273,18 @@ public class Main {
                 history_sum += pages.get(j).avgtime;
             }
             p.historyScore = p.avgtime/history_sum;
+        }
+
+        System.out.println("Printing page history Score");
+        Collections.sort(history_pages, new Comparator<Page>() {
+            public int compare(Page p1, Page p2) {
+                return p1.historyScore > p2.historyScore ? -1 : 1;
+            }
+        });
+
+        for(int j=0; j<n; j++){
+            System.out.print(String.format("%-15s", history_pages.get(j).title));
+            System.out.println(pages.get(j).historyScore);
         }
     }
     
@@ -358,6 +384,17 @@ public class Main {
                 p.popularityScore = p.newpopularityScore;
             }
         }
+        System.out.println("Printing page popularity Score");
+        Collections.sort(pages, new Comparator<Page>() {          
+        	public int compare(Page p1, Page p2) {
+                 return p1.popularityScore > p2.popularityScore ? -1 : 1;
+            }
+       });
+
+      for(int j=0; j<n; j++){
+           System.out.print(String.format("%-15s", pages.get(j).title));
+           System.out.println(pages.get(j).popularityScore);
+      }
     }
     
     //Calculate domain score of pages according to user preference
