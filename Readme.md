@@ -12,8 +12,31 @@ In the PageRank Algorithm, the rank of a page is dependent only on the number of
 ### Installation Guide
 
 ##### Project Setup
+##### 1. Git clone or download the repository into your local machine
+```sh
+Commands for cloning into through git:
+git clone https://github.com/shaansen/PageRank.git
+```
+```sh
+If you download the ZIP folder, unzip it.
+```
+##### 2. Include required html pages in the input folder if you want to experiment with more html pages
 
-##### How to run the code
+##### 3. Include the jsoup jar into the build path variables.
+
+##### 4. Run the .py files in Python compiler to generate history_log and domain_log files
+```sh
+Commands for generating history_log:
+python ./generatelog.py
+```
+```sh
+Commands for generating domain_log:
+python ./mydomainlog.py
+```
+Include both the generated files in input folder
+
+You are done with initial setup required for the project.
+
 #### Compile and Run:
 ##### 1. run javac and specify external jars
 ```sh
