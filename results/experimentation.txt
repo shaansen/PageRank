@@ -1,5 +1,5 @@
-Query : north
-Domain : .org
+1. Query : north
+   Domain : .org
 
 Printing page popularity Score
 Pinniped       0.058237452
