@@ -1,0 +1,94 @@
+Query : north
+Domain : .org
+
+Printing page popularity Score
+Pinniped       0.058237452
+Bear           0.05024701
+Seal           0.045778934
+Shantanu       0.04121848
+PolarBear      0.041131496
+Walrus         0.03867746
+Arctic         0.030457614
+Atlantic       0.028853854
+Pacific        0.028022116
+
+Printing page history Score
+Atlantic       0.15489748
+Pinniped       0.12528473
+Pacific        0.12300683
+PolarBear      0.11845102
+Walrus         0.111617304
+Seal           0.095671974
+Arctic         0.095671974
+Shantanu       0.09339407
+Bear           0.08200455
+
+Printing page Content Score
+Arctic         0.010416667
+Pacific        0.004032258
+Bear           0.003816794
+Walrus         0.0025
+Shantanu       0.0021141649
+Atlantic       0.0
+Pinniped       0.0
+PolarBear      0.0
+Seal           0.0
+
+Printing page Domain Score
+Pacific        1.0
+Atlantic       1.0
+Seal           1.0
+Arctic         0.0
+Bear           0.0
+Walrus         0.0
+Shantanu       0.0
+Pinniped       0.0
+PolarBear      0.0
+
+
+2. Query : sea of atlas
+   Domain : .com
+
+Printing page popularity Score
+Pinniped       0.058237452
+Bear           0.05024701
+Seal           0.045778934
+Shantanu       0.04121848
+PolarBear      0.041131496
+Walrus         0.03867746
+Arctic         0.030457614
+Atlantic       0.028853854
+Pacific        0.028022116
+
+Printing page history Score
+Atlantic       0.15489748
+Pinniped       0.12528473
+Pacific        0.12300683
+PolarBear      0.11845102
+Walrus         0.111617304
+Seal           0.095671974
+Arctic         0.095671974
+Shantanu       0.09339407
+Bear           0.08200455
+
+Printing page Content Score
+Atlantic       0.0032467532
+Pinniped       0.0
+Pacific        0.0
+PolarBear      0.0
+Walrus         0.0
+Seal           0.0
+Arctic         0.0
+Shantanu       0.0
+Bear           0.0
+
+Printing page Domain Score
+PolarBear      1.0
+Arctic         1.0
+Shantanu       1.0
+Bear           1.0
+Atlantic       0.0
+Pinniped       0.0
+Pacific        0.0
+Walrus         0.0
+Seal           0.0
